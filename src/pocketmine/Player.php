@@ -3563,12 +3563,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		return false;
 	}
 
-	/**
-	 * Send a title text or/and with/without a sub title text to a player
-	 *
-	 * @param $title
-	 * @return bool
-	 */
+    /**
+     * Send a title text or/and with/without a sub title text to a player
+     *
+     * @param $title
+     * @param string $subtitle
+     * @return bool
+     */
 	public function sendTitle($title, $subtitle = ""){
 		$pk = new SetTitlePacket();
 		$pk->type = SetTitlePacket::TYPE_TITLE;
