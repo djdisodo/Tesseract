@@ -54,6 +54,7 @@ use pocketmine\level\generator\Flat;
 use pocketmine\level\generator\Generator;
 use pocketmine\level\generator\nether\Nether;
 use pocketmine\level\generator\normal\Normal;
+use pocketmine\level\generator\normal\Normal2;
 use pocketmine\level\Level;
 use pocketmine\level\LevelException;
 use pocketmine\metadata\EntityMetadataStore;
@@ -736,7 +737,7 @@ class Server{
 	 *
 	 * @return OfflinePlayer|Player
 	 */
-	public function getOfflinePlayer($name){
+	public function getOfflinePlayer($name) : CompoundTag{
 		$name = strtolower($name);
 		$result = $this->getPlayerExact($name);
 
@@ -1775,6 +1776,7 @@ class Server{
 
 			Generator::addGenerator(Flat::class, "flat");
 			Generator::addGenerator(Normal::class, "normal");
+			Generator::addGenerator(Normal2::class, "normal2");
 			Generator::addGenerator(Normal::class, "default");
 			Generator::addGenerator(Nether::class, "hell");
 			Generator::addGenerator(Nether::class, "nether");

@@ -12,8 +12,7 @@
 
 #Version of this file
 config:
- version: 28
-
+ version: 29
 level:
  #This settting decides if weather is enabled in game (rain may cause lag to older devices)
  weather: true
@@ -57,12 +56,20 @@ player:
  chunk-radius: -1
  
 anticheat:
+ #This setting decides if the system tracks the movement speed and position of everyone in game, it will see if it is good or bad
+ #Recommended that it stays "true", but set it to "false" if it bugs out players that do not use modifiers
  check-movement: true
+ #This setting decides if instant breaking by modifiers is allowed or not
+ #Recommended that it stays "false"
  allow-instabreak: false
+ #This setting decides if flying will be detected/tracked or not
+ #Recommended it is set to "true", but set it to "false" if it bugs out players that do not use modifiers
  anti-fly: true
 
 developer:
-  folder-plugin-loader: false
+  #This setting allows the server to load plugins through the source directory over a .phar file
+  #Recommended that it stays "false"
+  folder-plugin-loader: true
  
 server:
  #This setting decides if the server.log file will not be made/written.
