@@ -19,15 +19,18 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
+use pocketmine\entity\Ageable;
+use pocketmine\entity\Creature;
+use pocketmine\entity\NPC;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 
-class Villager extends Creature implements NPC, Ageable{
+class Villager extends Creature implements NPC , Ageable {
 	const PROFESSION_FARMER = 0;
 	const PROFESSION_LIBRARIAN = 1;
 	const PROFESSION_PRIEST = 2;

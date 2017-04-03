@@ -19,30 +19,65 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
+use pocketmine\entity\FlyingAnimal;
+use pocketmine\level\Level;
+use pocketmine\nbt\tag\ByteTag;
 use pocketmine\network\protocol\AddEntityPacket;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\item\Item as ItemItem;
 
-class Chicken extends Animal{
-	const NETWORK_ID = 10;
+class Bat extends FlyingAnimal {
+
+	const NETWORK_ID = 19;
+
+	const DATA_IS_RESTING = 16;
 
 	public $width = 0.6;
 	public $length = 0.6;
-	public $height = 1.8;
+	public $height = 0.6;
 
-	public $dropExp = [1, 3];
-	
-	public function getName() : string{
-		return "Chicken";
+	public $flySpeed = 0.8;
+	public $switchDirectionTicks = 100;
+
+	public function getName() : string {
+		return "Bat";
 	}
-	
+
+	public function initEntity(){
+		$this->setMaxHealth(6);
+		parent::initEntity();
+	}
+
+	public function __construct(Level $level, CompoundTag $nbt){
+		if(!isset($nbt->isResting)){
+			$nbt->isResting = new ByteTag("isResting", 0);
+		}
+		parent::__construct($level, $nbt);
+
+		$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_RESTING, $this->isResting());
+	}
+
+	public function isResting() : int{
+		return (int) $this->namedtag["isResting"];
+	}
+
+	public function setResting(bool $resting){
+		$this->namedtag->isResting = new ByteTag("isResting", $resting ? 1 : 0);
+	}
+
+	public function onUpdate($currentTick){
+		if ($this->age > 20 * 60 * 10) {
+			$this->kill();
+		}
+		return parent::onUpdate($currentTick);
+	}
+
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = Chicken::NETWORK_ID;
+		$pk->type = Bat::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
@@ -53,25 +88,7 @@ class Chicken extends Animal{
 		$pk->pitch = $this->pitch;
 		$pk->metadata = $this->dataProperties;
 		$player->dataPacket($pk);
+
 		parent::spawnTo($player);
-	}
-	
-	public function getDrops(){
-		$drops = [];
-		if ($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player) {
-			
-				switch (\mt_rand(0, 2)) {
-					case 0:
-						$drops[] = ItemItem::get(ItemItem::RAW_CHICKEN, 0, 1);
-						break;
-					case 1:
-						$drops[] = ItemItem::get(ItemItem::FEATHER, 0, 1);
-						break;
-					case 2:
-						$drops[] = ItemItem::get(ItemItem::FEATHER, 0, 2);
-						break;
-				}
-		}
-		return $drops;
 	}
 }

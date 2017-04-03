@@ -19,9 +19,11 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
 use pocketmine\block\Wool;
+use pocketmine\entity\Animal;
+use pocketmine\entity\Colorable;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
@@ -29,7 +31,7 @@ use pocketmine\item\Item as ItemItem;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\CompoundTag;
 
-class Sheep extends Animal implements Colorable{
+class Sheep extends Animal implements Colorable {
 	const NETWORK_ID = 13;
 
 	const DATA_COLOR_INFO = 16;

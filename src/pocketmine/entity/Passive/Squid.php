@@ -19,8 +19,10 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
+use pocketmine\entity\Ageable;
+use pocketmine\entity\WaterAnimal;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -30,7 +32,7 @@ use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\Player;
 
-class Squid extends WaterAnimal implements Ageable{
+class Squid extends WaterAnimal implements Ageable {
 	const NETWORK_ID = 17;
 
 	public $width = 0.95;

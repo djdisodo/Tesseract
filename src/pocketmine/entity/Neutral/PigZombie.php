@@ -19,8 +19,9 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Neutral;
 
+use pocketmine\entity\Monster;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEquipmentPacket;
 use pocketmine\event\entity\EntityDamageByEntityEvent;

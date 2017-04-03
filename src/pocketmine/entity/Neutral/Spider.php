@@ -10,7 +10,7 @@
  * \_____/ |_____| |_|  \_| |_| /_____/  /_/     /_____/
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -19,29 +19,30 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Neutral;
 
-use pocketmine\item\enchantment\Enchantment;
+use pocketmine\entity\Monster;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\item\Item as ItemItem;
 
-class Mooshroom extends Animal{
-	const NETWORK_ID = 16;
-
+class Spider extends Monster {
+	const NETWORK_ID = 35;
 	public $width = 0.3;
 	public $length = 0.9;
-	public $height = 1.8;
+	public $height = 1.9;
+
+	public $dropExp = [5, 5];
 	
 	public function getName() : string{
-		return "Mooshroom";
+		return "Spider";
 	}
-	
+
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = Mooshroom::NETWORK_ID;
+		$pk->type = Spider::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
@@ -53,17 +54,27 @@ class Mooshroom extends Animal{
 		$pk->metadata = $this->dataProperties;
 		$player->dataPacket($pk);
 
+
 		parent::spawnTo($player);
 	}
 	
 	public function getDrops(){
-		$lootingL = 0;
-		$cause = $this->lastDamageCause;
-		if($cause instanceof EntityDamageByEntityEvent and $cause->getDamager() instanceof Player){
-			$lootingL = $cause->getDamager()->getItemInHand()->getEnchantmentLevel(Enchantment::TYPE_WEAPON_LOOTING);
+		$drops = array(ItemItem::get(ItemItem::STRING, 0, 1));
+		if ($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player) {
+			if (mt_rand(0, 199) < 5) {
+				switch (mt_rand(0, 2)) {
+					case 0:
+						$drops[] = ItemItem::get(ItemItem::IRON_INGOT, 0, 1);
+						break;
+					case 1:
+						$drops[] = ItemItem::get(ItemItem::CARROT, 0, 1);
+						break;
+					case 2:
+						$drops[] = ItemItem::get(ItemItem::POTATO, 0, 1);
+						break;
+				}
+			}
 		}
-		$drops = array(ItemItem::get(ItemItem::RAW_BEEF, 0, mt_rand(1, 3 + $lootingL)));
-		$drops[] = ItemItem::get(ItemItem::LEATHER, 0, mt_rand(0, 2 + $lootingL));
 		return $drops;
 	}
 }

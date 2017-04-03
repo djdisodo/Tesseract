@@ -19,8 +19,9 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
+use pocketmine\entity\Animal;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -31,7 +32,7 @@ use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Player;
 
-class Rabbit extends Animal{
+class Rabbit extends Animal {
 	const NETWORK_ID = 18;
 
 	const DATA_RABBIT_TYPE = 18;
