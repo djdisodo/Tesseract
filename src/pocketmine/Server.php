@@ -261,38 +261,6 @@ class Server{
 	private $levelDefault = null;
 
 	private $aboutContent = "";
-
-	/** Advanced Config */
-	public $advancedConfig = null;
-
-	public $weatherEnabled = true;
-	public $foodEnabled = true;
-	public $expEnabled = true;
-	public $keepInventory = false;
-	public $netherEnabled = false;
-	public $netherName = "nether";
-	public $weatherRandomDurationMin = 6000;
-	public $weatherRandomDurationMax = 12000;
-	public $lightningTime = 200;
-	public $lightningFire = false;
-	public $version;
-	public $autoClearInv = true;
-	public $anvilEnabled = false;
-	public $asyncChunkRequest = true;
-	public $keepExperience = false;
-	public $limitedCreative = true;
-	public $chunkRadius = -1;
-	public $allowSplashPotion = true;
-	public $fireSpread = false;
-	public $advancedCommandSelector = false;
-	public $enchantingTableEnabled = true;
-	public $countBookshelf = false;
-	public $allowInventoryCheats = false;
-	public $raklibDisable = false;
-	public $checkMovement = true;
-	public $antiFly = true;
-	public $allowInstabreak = false;
-	public $folderpluginloader = false;
 	
 	/**
 	 * @return string
@@ -1421,37 +1389,6 @@ class Server{
 		}, $microseconds);
 	}
 
-	public function loadAdvancedConfig(){
-		$this->weatherEnabled = $this->getAdvancedProperty("level.weather", true);
-		$this->foodEnabled = $this->getAdvancedProperty("player.hunger", true);
-		$this->expEnabled = $this->getAdvancedProperty("player.experience", true);
-		$this->keepInventory = $this->getAdvancedProperty("player.keep-inventory", false);
-		$this->keepExperience = $this->getAdvancedProperty("player.keep-experience", false);
-		$this->netherEnabled = $this->getAdvancedProperty("level.allow-nether", false);
-		$this->netherName = $this->getAdvancedProperty("level.level-name", "nether");
-		$this->weatherRandomDurationMin = $this->getAdvancedProperty("level.weather-random-duration-min", 6000);
-		$this->weatherRandomDurationMax = $this->getAdvancedProperty("level.weather-random-duration-max", 12000);
-		$this->lightningTime = $this->getAdvancedProperty("level.lightning-time", 200);
-		$this->lightningFire = $this->getAdvancedProperty("level.lightning-fire", false);
-		$this->autoClearInv = $this->getAdvancedProperty("player.auto-clear-inventory", true);
-		$this->getLogger()->setWrite(!$this->getAdvancedProperty("server.disable-log", false));
-		$this->asyncChunkRequest = $this->getAdvancedProperty("server.async-chunk-request", true);
-		$this->limitedCreative = $this->getAdvancedProperty("server.limited-creative", true);
-		$this->chunkRadius = $this->getAdvancedProperty("player.chunk-radius", -1);
-		$this->allowSplashPotion = $this->getAdvancedProperty("server.allow-splash-potion", true);
-		$this->fireSpread = $this->getAdvancedProperty("level.fire-spread", false);
-		$this->advancedCommandSelector = $this->getAdvancedProperty("server.advanced-command-selector", false);
-		$this->anvilEnabled = $this->getAdvancedProperty("enchantment.enable-anvil", true);
-		$this->enchantingTableEnabled = $this->getAdvancedProperty("enchantment.enable-enchanting-table", true);
-		$this->countBookshelf = $this->getAdvancedProperty("enchantment.count-bookshelf", false);
-		$this->raklibDisable = $this->getAdvancedProperty("network.raklib-disable", false);
-		$this->allowInventoryCheats = $this->getAdvancedProperty("inventory.allow-cheats", false);
-		$this->checkMovement = $this->getAdvancedProperty("anticheat.check-movement", true);
-		$this->allowInstabreak = $this->getAdvancedProperty("anticheat.allow-instabreak", true);
-		$this->antiFly = $this->getAdvancedProperty("anticheat.anti-fly", true);
-		$this->folderpluginloader = $this->getAdvancedProperty("developer.folder-plugin-loader", false);
-	}
-
 	public function getBuild(){
 		return $this->version->getBuild();
 	}
@@ -1500,12 +1437,12 @@ class Server{
 			$this->dataPath = realpath($dataPath) . DIRECTORY_SEPARATOR;
 			$this->pluginPath = realpath($pluginPath) . DIRECTORY_SEPARATOR;
 
-			if(!file_exists($this->dataPath . "pocketmine.yml")){
-				$content = file_get_contents($this->filePath . "src/pocketmine/resources/pocketmine.yml");
-				@file_put_contents($this->dataPath . "pocketmine.yml", $content);
+			if(!file_exists($this->dataPath . "tesseract.yml")){
+				$content = file_get_contents($this->filePath . "src/pocketmine/resources/tesseract.yml");
+				@file_put_contents($this->dataPath . "tesseract.yml", $content);
 			}
 			if(!is_dir($this->pluginPath."Tesseract")) mkdir($this->pluginPath."Tesseract");
-			$this->config = new Config($configPath = $this->dataPath . "pocketmine.yml", Config::YAML, []);
+			$this->config = new Config($configPath = $this->dataPath . "tesseract.yml", Config::YAML, []);
 			$this->console = new CommandReader($logger);
 			$this->properties = new Config($this->dataPath . "server.properties", Config::PROPERTIES, [
 				"motd" => "Minecraft: PE Server",
@@ -1581,21 +1518,6 @@ class Server{
 			}
 
 			$lang = $this->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE);
-			if(file_exists($this->filePath . "src/pocketmine/resources/tesseract_$lang.yml")){
-				$content = file_get_contents($file = $this->filePath . "src/pocketmine/resources/tesseract_$lang.yml");
-			}else{
-				$content = file_get_contents($file = $this->filePath . "src/pocketmine/resources/tesseract_eng.yml");
-			}
-
-			if(!file_exists($this->dataPath . "tesseract.yml")){
-				@file_put_contents($this->dataPath . "tesseract.yml", $content);
-			}
-			$internelConfig = new Config($file, Config::YAML, []);
-			$this->advancedConfig = new Config($this->dataPath . "tesseract.yml", Config::YAML, []);
-			$cfgVer = $this->getAdvancedProperty("config.version", 0, $internelConfig);
-			$advVer = $this->getAdvancedProperty("config.version", 0);
-
-			$this->loadAdvancedConfig();
 
 			$this->forceLanguage = $this->getProperty("settings.force-language", false);
 			$this->baseLang = new BaseLang($this->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE));
@@ -1700,7 +1622,7 @@ class Server{
 			$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
 			$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 			$this->pluginManager->registerInterface(PharPluginLoader::class);
-			if($this->getAdvancedProperty("developer.folder-plugin-loader") === true) {
+			if($this->getProperty("settings.folder-plugin-loader", true)) {
                 $this->pluginManager->registerInterface(FolderPluginLoader::class);
             }
 			$this->pluginManager->registerInterface(ScriptPluginLoader::class);
@@ -1714,7 +1636,7 @@ class Server{
 
 			$this->enablePlugins(PluginLoadOrder::STARTUP);
 			
-			if($this->getAdvancedProperty("network.raklib-disable") === false){
+			if(!$this->getProperty("network.raklib-disable", true)){
 			$this->network->registerInterface(new RakLibInterface($this));
 			} else {
 				$this->logger->notice("Raklib disabled by tesseract.yml!");
@@ -1735,7 +1657,7 @@ class Server{
 
 			if(!$this->getProperty("level-settings.default-format", "mcregion")){
 					$this->getLogger()->warning("McRegion is deprecated please refrain from using it!");
-				}
+            }
 
 			foreach((array) $this->getProperty("worlds", []) as $name => $worldSetting){
 				if($this->loadLevel($name) === false){
@@ -1784,11 +1706,11 @@ class Server{
 				return;
 			}
 			
-			if($this->netherEnabled){
-				if(!$this->loadLevel($this->netherName)){
-					$this->generateLevel($this->netherName, time(), Generator::getGenerator("nether"));
+			if($this->getProperty("level-settings.allow-nether", true)){
+				if(!$this->loadLevel($this->getProperty("level-settings.level-name", "nether"))){
+					$this->generateLevel($this->getProperty("level-settings.level-name", "nether"), time(), Generator::getGenerator("nether"));
 				}
-				$this->netherLevel = $this->getLevelByName($this->netherName);
+				$this->netherLevel = $this->getLevelByName($this->getProperty("level-settings.level-name", "nether"));
 			}
 
 
@@ -1797,10 +1719,6 @@ class Server{
 			}
 
 			$this->enablePlugins(PluginLoadOrder::POSTWORLD);
-
-			if($cfgVer > $advVer){
-				$this->logger->notice("Your tesseract.yml needs update (Current : $advVer -> Latest: $cfgVer)");
-			}
 
 			$this->start();
 		}catch(\Throwable $e){
@@ -2086,8 +2004,6 @@ class Server{
 
 		$this->logger->info("Reloading properties...");
 		$this->properties->reload();
-		$this->advancedConfig->reload();
-		$this->loadAdvancedConfig();
 		$this->maxPlayers = $this->getConfigInt("max-players", 20);
 
 		if($this->getConfigBoolean("hardcore", false) === true and $this->getDifficulty() < 3){
@@ -2540,34 +2456,6 @@ class Server{
 			$this->getNetwork()->blockAddress($address, 600);
 		}
 		//TODO: add raw packet events
-	}
-
-	/**
-	 * @param             $variable
-	 * @param null        $defaultValue
-	 * @param Config|null $cfg
-	 * @return bool|mixed|null
-	 */
-	public function getAdvancedProperty($variable, $defaultValue = null, Config $cfg = null){
-		$vars = explode(".", $variable);
-		$base = array_shift($vars);
-		if($cfg == null) $cfg = $this->advancedConfig;
-		if($cfg->exists($base)){
-			$base = $cfg->get($base);
-		}else{
-			return $defaultValue;
-		}
-
-		while(count($vars) > 0){
-			$baseKey = array_shift($vars);
-			if(is_array($base) and isset($base[$baseKey])){
-				$base = $base[$baseKey];
-			}else{
-				return $defaultValue;
-			}
-		}
-
-		return $base;
 	}
 
 	public function updateQuery(){

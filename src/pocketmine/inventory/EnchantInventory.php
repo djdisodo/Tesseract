@@ -240,7 +240,7 @@ class EnchantInventory extends TemporaryInventory{
 	}
 
 	public function countBookshelf() : int{
-		if($this->getHolder()->getLevel()->getServer()->countBookshelf){
+		if($this->getHolder()->getLevel()->getServer()->getProperty("enchantment.count-bookshelf", true)){
 			$count = 0;
 			$pos = $this->getHolder();
 			$offsets = [[2, 0], [-2, 0], [0, 2], [0, -2], [2, 1], [2, -1], [-2, 1], [-2, 1], [1, 2], [-1, 2], [1, -2], [-1, -2]];

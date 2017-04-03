@@ -52,20 +52,12 @@ class WeatherCommand extends VanillaCommand{
 
 		if($sender instanceof Player){
 			$wea = Weather::getWeatherFromString($args[0]);
-			if(!isset($args[1])) $duration = mt_rand(min($sender->getServer()->weatherRandomDurationMin, $sender->getServer()->weatherRandomDurationMax), max($sender->getServer()->weatherRandomDurationMin, $sender->getServer()->weatherRandomDurationMax));
+			if(!isset($args[1])) $duration = mt_rand(min($sender->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $sender->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)), max($sender->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $sender->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)));
 			else $duration = (int) $args[1];
 			if($wea >= 0 and $wea <= 3){
 				$sender->getLevel()->getWeather()->setWeather($wea, $duration);
 				$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.changed", [$sender->getLevel()->getFolderName()]));
 				return true;
-				/*if(WeatherManager::isRegistered($sender->getLevel())){
-					$sender->getLevel()->getWeather()->setWeather($wea, $duration);
-					$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.changed", [$sender->getLevel()->getFolderName()]));
-					return true;
-				}else{
-					$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.noregistered", [$sender->getLevel()->getFolderName()]));
-					return false;
-				}*/
 			}else{
 				$sender->sendMessage(TextFormat::RED . "%pocketmine.command.weather.invalid");
 				return false;
@@ -84,20 +76,12 @@ class WeatherCommand extends VanillaCommand{
 		}
 
 		$wea = Weather::getWeatherFromString($args[1]);
-		if(!isset($args[1])) $duration = mt_rand(min($sender->getServer()->weatherRandomDurationMin, $sender->getServer()->weatherRandomDurationMax), max($sender->getServer()->weatherRandomDurationMin, $sender->getServer()->weatherRandomDurationMax));
+		if(!isset($args[1])) $duration = mt_rand(min($sender->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $sender->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)), max($sender->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $sender->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)));
 		else $duration = (int) $args[1];
 		if($wea >= 0 and $wea <= 3){
 			$level->getWeather()->setWeather($wea, $duration);
 			$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.changed", [$level->getFolderName()]));
 			return true;
-			/*if(WeatherManager::isRegistered($level)){
-				$level->getWeather()->setWeather($wea, $duration);
-				$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.changed", [$level->getFolderName()]));
-				return true;
-			}else{
-				$sender->sendMessage(new TranslationContainer("pocketmine.command.weather.noregistered", [$level->getFolderName()]));
-				return false;
-			}*/
 		}else{
 			$sender->sendMessage(TextFormat::RED . "%pocketmine.command.weather.invalid");
 			return false;

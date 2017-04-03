@@ -105,7 +105,7 @@ class XPOrb extends Entity{
 			}
 
 			if($minDistance <= 1.3){
-				if($this->getLevel()->getServer()->expEnabled and $target->canPickupXp()){
+				if($this->getLevel()->getServer()->getProperty("player.experience", true) and $target->canPickupXp()){
 					$this->getLevel()->getServer()->getPluginManager()->callEvent($ev = new PlayerPickupExpOrbEvent($target, $this->getExperience()));
 					if(!$ev->isCancelled()){
 						$this->kill();

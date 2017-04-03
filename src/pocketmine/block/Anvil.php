@@ -70,14 +70,10 @@ class Anvil extends Fallable{
 	}
 
 	public function onActivate(Item $item, Player $player = null){
-		if(!$this->getLevel()->getServer()->anvilEnabled){
+		if(!$this->getLevel()->getServer()->getProperty("enchantment.enable-anvil", true)){
 			return true;
 		}
 		if($player instanceof Player){
-			if($player->isCreative() and $player->getServer()->limitedCreative){
-				return true;
-			}
-
 			$player->addWindow(new AnvilInventory($this));
 			$player->craftingType = Player::CRAFTING_ANVIL;
 		}

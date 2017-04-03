@@ -189,7 +189,7 @@ class BaseTransaction implements Transaction{
 
 	public function execute(Player $source): bool{
 		if($this->getInventory()->processSlotChange($this)){ //This means that the transaction should be handled the normal way
-			if(!$source->getServer()->allowInventoryCheats and !$source->isCreative()){
+			if(!$source->getServer()->getProperty("anticheat.allow-cheats") and !$source->isCreative()){
 				$change = $this->getChange();
 
 				if($change === null){ //No changes to make, ignore this transaction

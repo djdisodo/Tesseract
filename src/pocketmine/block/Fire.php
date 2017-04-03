@@ -98,7 +98,7 @@ class Fire extends Flowable{
 				return Level::BLOCK_UPDATE_NORMAL;
 			}elseif($type == Level::BLOCK_UPDATE_NORMAL or $type == Level::BLOCK_UPDATE_RANDOM){
 				$this->getLevel()->scheduleUpdate($this, $this->getTickRate() + mt_rand(0, 10));
-			}elseif($type == Level::BLOCK_UPDATE_SCHEDULED and $this->getLevel()->getServer()->fireSpread){
+			}elseif($type == Level::BLOCK_UPDATE_SCHEDULED and $this->getLevel()->getServer()->getProperty("level-settings.fire-spread", true)){
 				$forever = $this->getSide(Vector3::SIDE_DOWN)->getId() == Block::NETHERRACK;
 
 				//TODO: END

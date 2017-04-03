@@ -94,14 +94,12 @@ use pocketmine\network\protocol\DataPacket;
 use pocketmine\network\protocol\FullChunkDataPacket;
 use pocketmine\network\protocol\LevelEventPacket;
 use pocketmine\network\protocol\MoveEntityPacket;
-use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
-
 use pocketmine\Server;
 use pocketmine\tile\Chest;
 use pocketmine\tile\Tile;
@@ -404,9 +402,9 @@ class Level implements ChunkManager, Metadatable{
 		$this->tickRate = 1;
 
 		$this->weather = new Weather($this, 0);
-		if($this->server->netherEnabled and $this->server->netherName == $this->folderName) $this->setDimension(self::DIMENSION_NETHER);
+		if($this->server->getProperty("level-settings.allow-nether", true) and $this->server->getProperty("level-settings.level-name", "nether") == $this->folderName) $this->setDimension(self::DIMENSION_NETHER);
 		else $this->setDimension(self::DIMENSION_NORMAL);
-		if($this->server->weatherEnabled and $this->getDimension() == self::DIMENSION_NORMAL){
+		if($this->server->getProperty("level-settings.weather", true) and $this->getDimension() == self::DIMENSION_NORMAL){
 			$this->weather->setCanCalculate(true);
 		}else $this->weather->setCanCalculate(false);
 	}
@@ -1610,7 +1608,7 @@ class Level implements ChunkManager, Metadatable{
 		}
 
 		if($player !== null){
-			$ev = new BlockBreakEvent($player, $target, $item, ($player->isCreative() or $this->server->allowInstabreak));
+			$ev = new BlockBreakEvent($player, $target, $item, ($player->isCreative() or $this->server->getProperty("anticheat.check-instabreak", true)));
 
 			if($player->isAdventure() or $player->isSpectator() or ($player->isSurvival() and $item instanceof Item and !$target->isBreakable($item))){
 				$ev->setCancelled();
@@ -1650,7 +1648,7 @@ class Level implements ChunkManager, Metadatable{
 
 			$drops = $ev->getDrops();
 
-			if($player->isSurvival() and $this->getServer()->expEnabled){
+			if($player->isSurvival() and $this->getServer()->getProperty("player.experience", true)){
 				$exp = 0;
 				if($item->getEnchantmentLevel(Enchantment::TYPE_MINING_SILK_TOUCH) === 0){
 					switch($target->getId()){

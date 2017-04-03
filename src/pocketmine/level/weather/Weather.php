@@ -72,8 +72,8 @@ class Weather{
 			
 			if($this->duration <= 0){
 				$duration = mt_rand(
-						min($this->level->getServer()->weatherRandomDurationMin, $this->level->getServer()->weatherRandomDurationMax), 
-						max($this->level->getServer()->weatherRandomDurationMin, $this->level->getServer()->weatherRandomDurationMax));
+						min($this->level->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $this->level->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)),
+						max($this->level->getServer()->getProperty("level-settings.weather-random-duration-min", 6000), $this->level->getServer()->getProperty("level-settings.weather-random-duration-max", 12000)));
 
 				if($this->weatherNow === self::SUNNY){ 
 					$weather = $this->randomWeatherData[array_rand($this->randomWeatherData)];
@@ -83,7 +83,7 @@ class Weather{
 					$this->setWeather($weather, $duration);
 				}
 			}
-			if(($this->weatherNow >= self::RAINY_THUNDER) and ($this->level->getServer()->lightningTime > 0) and is_int($this->duration / $this->level->getServer()->lightningTime)){
+			if(($this->weatherNow >= self::RAINY_THUNDER) and ($this->level->getServer()->getProperty("level-settings.lightning-time", 200) > 0) and is_int($this->duration / $this->level->getServer()->getProperty("level-settings.lightning-time", 200))){
 				$players = $this->level->getPlayers();
 				if(count($players) > 0){
 					$p = $players[array_rand($players)];

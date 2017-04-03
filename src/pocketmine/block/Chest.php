@@ -164,9 +164,6 @@ class Chest extends Transparent{
 				}
 			}
 
-			if($player->isCreative() and $player->getServer()->limitedCreative){
-				return true;
-			}
 			$player->addWindow($chest->getInventory());
 		}
 

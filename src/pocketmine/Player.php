@@ -1245,10 +1245,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			return false;
 		}
 
-		if($this->server->autoClearInv){
-			$this->inventory->clearAll();
-		}
-
 		$this->gamemode = $gm;
 
 		$this->allowFlight = $this->isCreative();
@@ -1376,7 +1372,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$item = Item::get(Item::ARROW, $entity->getPotionId(), 1);
 
 				$add = false;
-				if(!$this->server->allowInventoryCheats and !$this->isCreative()){
+				if(!$this->server->getProperty("anticheat.allow-cheats", true) and !$this->isCreative()){
 					if(!$this->getFloatingInventory()->canAddItem($item) or !$this->inventory->canAddItem($item)){
 						//The item is added to the floating inventory to allow client to handle the pickup
 						//We have to also check if it can be added to the real inventory before sending packets.
@@ -1405,7 +1401,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 					if($item instanceof Item){
 						$add = false;
-						if(!$this->server->allowInventoryCheats and !$this->isCreative()){
+						if(!$this->server->getProperty("anticheat.allow-cheats", true) and !$this->isCreative()){
 							if(!$this->getFloatingInventory()->canAddItem($item) or !$this->inventory->canAddItem($item)){
 								continue;
 							}
@@ -1453,7 +1449,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 		$revert = false;
 
-		if($this->server->checkMovement){
+		if($this->server->getProperty("anticheat.check-movement", true)){
 			if(($distanceSquared / ($tickDiff ** 2)) > 200){
 				$revert = true;
 			}else{
@@ -1537,7 +1533,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$this->server->getPluginManager()->callEvent($ev);
 
 				if(!($revert = $ev->isCancelled())){ //Yes, this is intended
-					if($this->server->netherEnabled){
+					if($this->server->getProperty("level-settings.allow-nether", true)){
 						if($this->isInsideOfPortal()){
 							if($this->portalTime == 0){
 								$this->portalTime = $this->server->getTick();
@@ -1675,11 +1671,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$this->timings->startTiming();
 
 		if($this->spawned){
-			if($this->server->netherEnabled){
+			if($this->server->getProperty("level-settings.allow-nether", true)){
 				if(($this->isCreative() or $this->isSurvival() and $this->server->getTick() - $this->portalTime >= 80) and $this->portalTime > 0){
 					$netherLevel = null;
-					if($this->server->isLevelLoaded($this->server->netherName) or $this->server->loadLevel($this->server->netherName)){
-						$netherLevel = $this->server->getLevelByName($this->server->netherName);
+					if($this->server->isLevelLoaded($this->server->getProperty("level-settings.level-name", "nether")) or $this->server->loadLevel($this->server->getProperty("level-settings.level-name", "nether"))){
+						$netherLevel = $this->server->getLevelByName($this->server->getProperty("level-settings.level-name", "nether"));
 					}
 
 					if($netherLevel instanceof Level){
@@ -2017,7 +2013,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					$this->viewDistance = $packet->radius ** 2;
 				}*/
 				$pk = new ChunkRadiusUpdatedPacket();
-				$pk->radius = ($this->server->chunkRadius != -1) ? $this->server->chunkRadius : $packet->radius;
+				$pk->radius = (!$this->server->getProperty("chunk-sending.chunk-radius", -1)) ? $this->server->getProperty("chunk-sending.chunk-radius", -1) : $packet->radius;
 				$this->dataPacket($pk);
 				break;
 			case ProtocolInfo::PLAYER_INPUT_PACKET:
@@ -2311,7 +2307,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                             break;
 
                         case Item::SPLASH_POTION:
-                            if($this->server->allowSplashPotion){
+                            if($this->server->getProperty("player.allow-splash-potion", true)){
                                 $f = 1.1;
                                 $nbt["PotionId"] = new ShortTag("PotionId", $item->getDamage());
                                 $entity = Entity::createEntity("ThrownPotion", $this->getLevel(), $nbt, $this);
@@ -2504,8 +2500,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 						$this->craftingType = self::CRAFTING_SMALL;
 
-						if($this->server->netherEnabled){
-							if($this->level === $this->server->getLevelByName($this->server->netherName)){
+						if($this->server->getProperty("level-settings.allow-nether", true)){
+							if($this->level === $this->server->getLevelByName($this->server->getProperty("level-settings.level-name", "nether"))){
 								$this->teleport($pos = $this->server->getDefaultLevel()->getSafeSpawn());
 							}
 						}
@@ -3729,8 +3725,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		Entity::kill();
 
 		$ev = new PlayerDeathEvent($this, $this->getDrops(), new TranslationContainer($message, $params));
-		$ev->setKeepInventory($this->server->keepInventory);
-		$ev->setKeepExperience($this->server->keepExperience);
+		$ev->setKeepInventory($this->server->getProperty("player.keep-inventory", true));
+		$ev->setKeepExperience($this->server->getProperty("player.keep-experience", true));
 		$this->server->getPluginManager()->callEvent($ev);
 
 		if(!$ev->getKeepInventory()){
@@ -3747,7 +3743,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			}
 		}
 
-		if($this->server->expEnabled and !$ev->getKeepExperience()){
+		if($this->server->getProperty("player.experience", true) and !$ev->getKeepExperience()){
 			$exp = min(91, $this->getTotalXp()); //Max 7 levels of exp dropped
 			$this->getLevel()->spawnXPOrb($this->add(0, 0.2, 0), $exp);
 			$this->setTotalXp(0, true);

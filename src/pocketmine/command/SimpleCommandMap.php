@@ -272,7 +272,7 @@ class SimpleCommandMap implements CommandMap{
 
 		$target->timings->startTiming();
 		try{
-			if($this->server->advancedCommandSelector){
+			if($this->server->getProperty("player.advanced-command-selector", true)){
 				$this->dispatchAdvanced($sender, $target, $sentCommandLabel, $args);
 			}else{
 				$target->execute($sender, $sentCommandLabel, $args);
