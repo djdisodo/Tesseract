@@ -2807,10 +2807,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					break;
 				}
 
-				if(($this->isCreative() and $this->server->limitedCreative)){
-					break;
-				}
-
 				$this->getTransactionQueue()->addTransaction(new DropItemTransaction($packet->item));
 				break;
 			case ProtocolInfo::COMMAND_STEP_PACKET:
@@ -3305,8 +3301,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 			return;
 		}
 
-		if(($this->isCreative() and $this->server->limitedCreative) or $this->isSpectator()){
-			//Ignore for limited creative
+		if($this->isSpectator()){
 			return;
 		}
 
