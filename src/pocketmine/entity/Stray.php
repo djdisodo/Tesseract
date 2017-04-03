@@ -22,12 +22,13 @@
 
 namespace pocketmine\entity;
 
+use pocketmine\entity\hostile\Skeleton;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 use pocketmine\network\protocol\MobEquipmentPacket;
 use pocketmine\item\Item as ItemItem;
 
-class Stray extends Skeleton{
+class Stray extends Skeleton {
 	const NETWORK_ID = 46;
 
 	public $dropExp = [5, 5];
