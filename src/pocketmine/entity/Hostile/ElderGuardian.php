@@ -19,9 +19,11 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Hostile;
 
 
+use pocketmine\entity\Ageable;
+use pocketmine\entity\WaterAnimal;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\item\Item as ItemItem;
@@ -32,12 +34,12 @@ use pocketmine\network\protocol\EntityEventPacket;
 use pocketmine\Player;
 
 
-class Guardian extends WaterAnimal implements Ageable{
-	const NETWORK_ID = 49;
+class ElderGuardian extends WaterAnimal implements Ageable {
+	const NETWORK_ID = 50;
 
-	public $width = 0.95;
-	public $length = 0.95;
-	public $height = 0.95;
+	public $width = 1.45;
+	public $length = 1.45;
+	public $height = 1.8;
 
 	public $dropExp = [5, 10];
 
@@ -49,11 +51,12 @@ class Guardian extends WaterAnimal implements Ageable{
 
 	public function initEntity(){
 		parent::initEntity();
-		$this->setMaxHealth(30);
+		$this->setMaxHealth(80);
+		$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ELDER, 1);
 	}
 
 	public function getName() : string{
-		return "Guardian";
+		return "Elder Guardian";
 	}
 
 	public function attack($damage, EntityDamageEvent $source){
@@ -69,7 +72,7 @@ class Guardian extends WaterAnimal implements Ageable{
 
 			$pk = new EntityEventPacket();
 			$pk->eid = $this->getId();
-			$this->server->broadcastPacket($this->hasSpawned, $pk);
+            $this->server->broadcastPacket($this->hasSpawned, $pk);
 		}
 	}
 
@@ -151,7 +154,7 @@ class Guardian extends WaterAnimal implements Ageable{
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = Guardian::NETWORK_ID;
+		$pk->type = ElderGuardian::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;

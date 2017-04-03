@@ -21,13 +21,14 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Passive;
 
+use pocketmine\entity\Living;
 use pocketmine\Player;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobArmorEquipmentPacket;
 
-class Horse extends Living{
+class Horse extends Living {
 
 	const NETWORK_ID = 23;
 

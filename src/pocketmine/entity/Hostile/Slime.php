@@ -10,7 +10,7 @@
  * \_____/ |_____| |_|  \_| |_| /_____/  /_/     /_____/
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -19,31 +19,33 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Hostile;
 
+use pocketmine\entity\Living;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item as ItemItem;
 
-class Blaze extends Monster{
-	const NETWORK_ID = 43;
+class Slime extends Living {
+	const NETWORK_ID = 37;
+
+	const DATA_SLIME_SIZE = 16;
 
 	public $width = 0.3;
 	public $length = 0.9;
-	public $height = 1.8;
+	public $height = 5;
 
-	public $dropExp = [10, 10];
+	public $dropExp = [1, 4];
 	
 	public function getName() : string{
-		return "Blaze";
+		return "Slime";
 	}
 	
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = self::NETWORK_ID;
+		$pk->type = Slime::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
@@ -56,15 +58,24 @@ class Blaze extends Monster{
 		$player->dataPacket($pk);
 		parent::spawnTo($player);
 	}
-
+	
 	public function getDrops(){
-		$cause = $this->lastDamageCause;
-		//Only drop when kill by player or dog(No add now.)
-		if($cause instanceof EntityDamageByEntityEvent and $cause->getDamager() instanceof Player){
-			$lootingL = $cause->getDamager()->getItemInHand()->getEnchantmentLevel(Enchantment::TYPE_WEAPON_LOOTING);
-			$drops = array(ItemItem::get(ItemItem::BLAZE_ROD, 0, mt_rand(0, 1 + $lootingL)));
-			return $drops;
+		$drops = array(ItemItem::get(ItemItem::SLIMEBALL, 0, 1));
+		if ($this->lastDamageCause instanceof EntityDamageByEntityEvent and $this->lastDamageCause->getEntity() instanceof Player) {
+			if (\mt_rand(0, 199) < 5) {
+				switch (\mt_rand(0, 2)) {
+					case 0:
+						$drops[] = ItemItem::get(ItemItem::IRON_INGOT, 0, 1);
+						break;
+					case 1:
+						$drops[] = ItemItem::get(ItemItem::CARROT, 0, 1);
+						break;
+					case 2:
+						$drops[] = ItemItem::get(ItemItem::POTATO, 0, 1);
+						break;
+				}
+			}
 		}
-		return [];
+		return $drops;
 	}
 }

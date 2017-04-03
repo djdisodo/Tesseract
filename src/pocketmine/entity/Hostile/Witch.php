@@ -19,12 +19,13 @@
  *
  */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Hostile;
 
+use pocketmine\entity\Monster;
 use pocketmine\Player;
 use pocketmine\network\protocol\AddEntityPacket;
 
-class Witch extends Monster{
+class Witch extends Monster {
 	const NETWORK_ID = 45;
 	
 	public $dropExp = [5, 5];

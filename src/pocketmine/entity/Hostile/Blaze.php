@@ -10,7 +10,7 @@
  * \_____/ |_____| |_|  \_| |_| /_____/  /_/     /_____/
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -19,27 +19,32 @@
  *
  */
 
+namespace pocketmine\entity\Hostile;
 
-namespace pocketmine\entity;
-
+use pocketmine\entity\Monster;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
-use pocketmine\network\protocol\MobEquipmentPacket;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\Item as ItemItem;
 
-class Skeleton extends Monster implements ProjectileSource{
-	const NETWORK_ID = 34;
+class Blaze extends Monster {
+	const NETWORK_ID = 43;
 
-	public $dropExp = [5, 5];
+	public $width = 0.3;
+	public $length = 0.9;
+	public $height = 1.8;
+
+	public $dropExp = [10, 10];
 	
 	public function getName() : string{
-		return "Skeleton";
+		return "Blaze";
 	}
 	
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = Skeleton::NETWORK_ID;
+		$pk->type = self::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
@@ -50,15 +55,17 @@ class Skeleton extends Monster implements ProjectileSource{
 		$pk->pitch = $this->pitch;
 		$pk->metadata = $this->dataProperties;
 		$player->dataPacket($pk);
-
 		parent::spawnTo($player);
-		
-		$pk = new MobEquipmentPacket();
-		$pk->eid = $this->getId();
-		$pk->item = new ItemItem(ItemItem::BOW);
-		$pk->slot = 0;
-		$pk->selectedSlot = 0;
+	}
 
-		$player->dataPacket($pk);
+	public function getDrops(){
+		$cause = $this->lastDamageCause;
+		//Only drop when kill by player or dog(No add now.)
+		if($cause instanceof EntityDamageByEntityEvent and $cause->getDamager() instanceof Player){
+			$lootingL = $cause->getDamager()->getItemInHand()->getEnchantmentLevel(Enchantment::TYPE_WEAPON_LOOTING);
+			$drops = array(ItemItem::get(ItemItem::BLAZE_ROD, 0, mt_rand(0, 1 + $lootingL)));
+			return $drops;
+		}
+		return [];
 	}
 }

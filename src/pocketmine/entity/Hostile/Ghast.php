@@ -2,11 +2,11 @@
 
 /*
  *
- *  ____            _        _   __  __ _                  __  __ ____
- * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \
+ *  ____            _        _   __  __ _                  __  __ ____  
+ * |  _ \ ___   ___| | _____| |_|  \/  (_)_ __   ___      |  \/  |  _ \ 
  * | |_) / _ \ / __| |/ / _ \ __| |\/| | | '_ \ / _ \_____| |\/| | |_) |
- * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/
- * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_|
+ * |  __/ (_) | (__|   <  __/ |_| |  | | | | | |  __/_____| |  | |  __/ 
+ * |_|   \___/ \___|_|\_\___|\__|_|  |_|_|_| |_|\___|     |_|  |_|_| 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,30 +15,36 @@
  *
  * @author PocketMine Team
  * @link http://www.pocketmine.net/
- *
+ * 
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Hostile;
 
+use pocketmine\entity\FlyingAnimal;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
-use pocketmine\network\protocol\MobEquipmentPacket;
-use pocketmine\item\Item as ItemItem;
 
-class WitherSkeleton extends Monster implements ProjectileSource{
-	const NETWORK_ID = 48;
+class Ghast extends FlyingAnimal {
+	const NETWORK_ID = 41;
 
-	public $dropExp = [5, 5];
+	public $width = 6;
+	public $length = 6;
+	public $height = 6;
 	
 	public function getName() : string{
-		return "Wither Skeleton";
+		return "Ghast";
+	}
+
+	public function initEntity(){
+		$this->setMaxHealth(10);
+		parent::initEntity();
 	}
 	
 	public function spawnTo(Player $player){
 		$pk = new AddEntityPacket();
 		$pk->eid = $this->getId();
-		$pk->type = WitherSkeleton::NETWORK_ID;
+		$pk->type = Ghast::NETWORK_ID;
 		$pk->x = $this->x;
 		$pk->y = $this->y;
 		$pk->z = $this->z;
@@ -51,13 +57,5 @@ class WitherSkeleton extends Monster implements ProjectileSource{
 		$player->dataPacket($pk);
 
 		parent::spawnTo($player);
-		
-		$pk = new MobEquipmentPacket();
-		$pk->eid = $this->getId();
-		$pk->item = new ItemItem(ItemItem::STONE_SWORD);
-		$pk->slot = 0;
-		$pk->selectedSlot = 0;
-
-		$player->dataPacket($pk);
 	}
 }

@@ -19,13 +19,14 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\Hostile;
 
+use pocketmine\entity\FlyingAnimal;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 use pocketmine\item\Item as ItemItem;
 
-class Wither extends FlyingAnimal{
+class Wither extends FlyingAnimal {
 	const NETWORK_ID = 52;
 
 	public $width = 0.72;
