@@ -21,7 +21,7 @@
  *
  */
 
-namespace pocketmine\entity\Passive;
+namespace pocketmine\entity\passive;
 
 use pocketmine\entity\Living;
 use pocketmine\Player;

@@ -19,7 +19,7 @@
  *
  */
 
-namespace pocketmine\entity\Passive;
+namespace pocketmine\entity\passive;
 
 use pocketmine\block\Wool;
 use pocketmine\entity\Animal;

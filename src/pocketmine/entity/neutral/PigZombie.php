@@ -19,7 +19,8 @@
  *
 */
 
-namespace pocketmine\entity\Neutral;
+
+namespace pocketmine\entity\neutral;
 
 use pocketmine\entity\Monster;
 use pocketmine\network\protocol\AddEntityPacket;
