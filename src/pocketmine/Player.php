@@ -2307,8 +2307,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 if($ev->isCancelled()){
                                     $entity->kill();
                                 }
-                                break;
                             }
+                            break;
 
                         case Item::ENDER_PEARL:
                             if(floor(($time = microtime(true)) - $this->lastEnderPearlUse) >= 1) {
@@ -2321,8 +2321,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
                                 } else {
                                     $this->lastEnderPearlUse = $time;
                                 }
-                                break;
                             }
+                            break;
                     }
 
                     if($entity instanceof Projectile and $entity->isAlive()){

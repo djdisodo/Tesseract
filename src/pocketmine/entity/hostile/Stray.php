@@ -20,8 +20,9 @@
  */
 
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\hostile;
 
+use pocketmine\entity\Entity;
 use pocketmine\entity\hostile\Skeleton;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;

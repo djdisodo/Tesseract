@@ -19,12 +19,13 @@
  *
 */
 
-namespace pocketmine\entity;
+namespace pocketmine\entity\hostile;
 
+use pocketmine\entity\Living;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\Player;
 
-class LavaSlime extends Living{
+class LavaSlime extends Living {
 	const NETWORK_ID = 42;
 
 	const DATA_SLIME_SIZE = 16;
