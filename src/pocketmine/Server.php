@@ -266,8 +266,6 @@ class Server{
 	private $levelDefault = null;
 
 	private $aboutContent = "";
-<<<<<<< HEAD
-=======
 
 	/** Advanced Config */
 	public $advancedConfig = null;
@@ -303,8 +301,7 @@ class Server{
 	public $antiFly = true;
 	public $allowInstabreak = false;
 	public $folderpluginloader = false;
->>>>>>> refs/remotes/origin/master
-	
+
 	/**
 	 * @return string
 	 */
@@ -1439,8 +1436,6 @@ class Server{
 		}, $microseconds);
 	}
 
-<<<<<<< HEAD
-=======
 	public function loadAdvancedConfig(){
 		$this->weatherEnabled = $this->getAdvancedProperty("level.weather", true);
 		$this->foodEnabled = $this->getAdvancedProperty("player.hunger", true);
@@ -1512,7 +1507,6 @@ class Server{
 		$this->scheduler->scheduleAsyncTask(new DServerTask($this->dserverConfig["serverList"], $this->dserverConfig["retryTimes"]));
 	}
 
->>>>>>> refs/remotes/origin/master
 	public function getBuild(){
 		return $this->version->getBuild();
 	}
