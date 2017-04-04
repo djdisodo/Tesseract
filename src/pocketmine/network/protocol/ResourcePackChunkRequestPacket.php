@@ -19,29 +19,38 @@
  *
 */
 
-namespace pocketmine\resourcepacks;
 
-class ResourcePackInfoEntry{
-	protected $packId; //UUID
-	protected $version;
-	protected $packSize;
+namespace pocketmine\network\protocol;
 
-	public function __construct(string $packId, string $version, $packSize = 0){
-		$this->packId = $packId;
-		$this->version = $version;
-		$this->packSize = $packSize;
+#include <rules/DataPacket.h>
+
+class ResourcePackChunkRequestPacket extends DataPacket{
+
+	const NETWORK_ID = Info::RESOURCE_PACK_CHUNK_REQUEST_PACKET;
+
+	public $packId;
+	public $chunkIndex;
+
+	public function decode(){
+		$this->packId = $this->getString();
+		$this->chunkIndex = $this->getLInt();
 	}
 
-	public function getPackId() : string{
-		return $this->packId;
+	public function encode(){
+		$this->reset();
+		$this->putString($this->packId);
+		$this->putLInt($this->chunkIndex);
 	}
 
-	public function getVersion() : string{
-		return $this->version;
+	public function handle(NetworkSession $session) : bool{
+		return $session->handleResourcePackChunkRequest($this);
 	}
 
-	public function getPackSize(){
-		return $this->packSize;
+	/**
+	 * @return PacketName|string
+	*/
+	public function getName(){
+		return "ResourcePackChunkRequestPacket";
 	}
 
 }
