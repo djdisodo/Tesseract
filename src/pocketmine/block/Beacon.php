@@ -43,6 +43,10 @@ class Beacon extends Transparent{
  		$this->meta = $meta;
  	}
  
+ 	public function canBeActivated() : bool{
+ 		return true;
+ 	}
+ 
  	public function getName(){
  		return "Beacon";
  	}

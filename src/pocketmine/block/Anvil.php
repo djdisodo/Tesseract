@@ -43,6 +43,10 @@ class Anvil extends Fallable{
 		$this->meta = $meta;
 	}
 
+	public function canBeActivated() : bool {
+		return true;
+	}
+
 	public function getHardness() {
 		return 5;
 	}

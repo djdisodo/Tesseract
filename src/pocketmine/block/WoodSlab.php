@@ -29,7 +29,6 @@ use pocketmine\Player;
 class WoodSlab extends Transparent{
 
 	protected $id = self::WOOD_SLAB;
-    protected $doubleId = self::DOUBLE_WOODEN_SLAB;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
@@ -79,31 +78,31 @@ class WoodSlab extends Transparent{
 	public function place(Item $item, Block $block, Block $target, $face, $fx, $fy, $fz, Player $player = null){
 		$this->meta &= 0x07;
 		if($face === 0){
-			if($target->getId() === $this->id and ($target->getDamage() & 0x08) === 0x08 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($target, Block::get($this->doubleId, $this->meta), true);
+			if($target->getId() === self::WOOD_SLAB and ($target->getDamage() & 0x08) === 0x08 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
+				$this->getLevel()->setBlock($target, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true);
 
 				return true;
-			}elseif($block->getId() === $this->id and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($block, Block::get($this->doubleId, $this->meta), true);
+			}elseif($block->getId() === self::WOOD_SLAB and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
+				$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true);
 
 				return true;
 			}else{
 				$this->meta |= 0x08;
 			}
 		}elseif($face === 1){
-			if($target->getId() === $this->id and ($target->getDamage() & 0x08) === 0 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($target, Block::get($this->doubleId, $this->meta), true);
+			if($target->getId() === self::WOOD_SLAB and ($target->getDamage() & 0x08) === 0 and ($target->getDamage() & 0x07) === ($this->meta & 0x07)){
+				$this->getLevel()->setBlock($target, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true);
 
 				return true;
-			}elseif($block->getId() === $this->id and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-				$this->getLevel()->setBlock($block, Block::get($this->doubleId, $this->meta), true);
+			}elseif($block->getId() === self::WOOD_SLAB and ($block->getDamage() & 0x07) === ($this->meta & 0x07)){
+				$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true);
 
 				return true;
 			}
 		}else{ //TODO: collision
-			if($block->getId() === $this->id){
+			if($block->getId() === self::WOOD_SLAB){
 				if(($block->getDamage() & 0x07) === ($this->meta & 0x07)){
-					$this->getLevel()->setBlock($block, Block::get($this->doubleId, $this->meta), true);
+					$this->getLevel()->setBlock($block, Block::get(Item::DOUBLE_WOOD_SLAB, $this->meta), true);
 
 					return true;
 				}
@@ -116,7 +115,7 @@ class WoodSlab extends Transparent{
 			}
 		}
 
-		if($block->getId() === $this->id and ($target->getDamage() & 0x07) !== ($this->meta & 0x07)){
+		if($block->getId() === self::WOOD_SLAB and ($target->getDamage() & 0x07) !== ($this->meta & 0x07)){
 			return false;
 		}
 		$this->getLevel()->setBlock($block, $this, true, true);

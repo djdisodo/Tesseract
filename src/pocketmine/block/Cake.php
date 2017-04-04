@@ -37,6 +37,10 @@ class Cake extends Transparent implements FoodSource{
 		$this->meta = $meta;
 	}
 
+	public function canBeActivated() : bool{
+		return true;
+	}
+
 	public function getHardness(){
 		return 0.5;
 	}
