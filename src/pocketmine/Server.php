@@ -89,6 +89,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginLoadOrder;
 use pocketmine\plugin\PluginManager;
 use pocketmine\plugin\ScriptPluginLoader;
+use pocketmine\scheduler\DServerTask;
 use pocketmine\scheduler\FileWriteTask;
 use pocketmine\scheduler\SendUsageTask;
 use pocketmine\scheduler\ServerScheduler;
@@ -265,6 +266,44 @@ class Server{
 	private $levelDefault = null;
 
 	private $aboutContent = "";
+<<<<<<< HEAD
+=======
+
+	/** Advanced Config */
+	public $advancedConfig = null;
+
+	public $weatherEnabled = true;
+	public $foodEnabled = true;
+	public $expEnabled = true;
+	public $keepInventory = false;
+	public $netherEnabled = false;
+	public $netherName = "nether";
+	public $weatherRandomDurationMin = 6000;
+	public $weatherRandomDurationMax = 12000;
+	public $lightningTime = 200;
+	public $lightningFire = false;
+	public $version;
+	public $autoClearInv = true;
+	public $dserverConfig = [];
+	public $dserverPlayers = 0;
+	public $dserverAllPlayers = 0;
+	public $anvilEnabled = false;
+	public $asyncChunkRequest = true;
+	public $keepExperience = false;
+	public $limitedCreative = true;
+	public $chunkRadius = -1;
+	public $allowSplashPotion = true;
+	public $fireSpread = false;
+	public $advancedCommandSelector = false;
+	public $enchantingTableEnabled = true;
+	public $countBookshelf = false;
+	public $allowInventoryCheats = false;
+	public $raklibDisable = false;
+	public $checkMovement = true;
+	public $antiFly = true;
+	public $allowInstabreak = false;
+	public $folderpluginloader = false;
+>>>>>>> refs/remotes/origin/master
 	
 	/**
 	 * @return string
@@ -1400,6 +1439,80 @@ class Server{
 		}, $microseconds);
 	}
 
+<<<<<<< HEAD
+=======
+	public function loadAdvancedConfig(){
+		$this->weatherEnabled = $this->getAdvancedProperty("level.weather", true);
+		$this->foodEnabled = $this->getAdvancedProperty("player.hunger", true);
+		$this->expEnabled = $this->getAdvancedProperty("player.experience", true);
+		$this->keepInventory = $this->getAdvancedProperty("player.keep-inventory", false);
+		$this->keepExperience = $this->getAdvancedProperty("player.keep-experience", false);
+		$this->netherEnabled = $this->getAdvancedProperty("level.allow-nether", false);
+		$this->netherName = $this->getAdvancedProperty("level.level-name", "nether");
+		$this->weatherRandomDurationMin = $this->getAdvancedProperty("level.weather-random-duration-min", 6000);
+		$this->weatherRandomDurationMax = $this->getAdvancedProperty("level.weather-random-duration-max", 12000);
+		$this->lightningTime = $this->getAdvancedProperty("level.lightning-time", 200);
+		$this->lightningFire = $this->getAdvancedProperty("level.lightning-fire", false);
+		$this->autoClearInv = $this->getAdvancedProperty("player.auto-clear-inventory", true);
+		$this->dserverConfig = [
+			"enable" => $this->getAdvancedProperty("dserver.enable", false),
+			"queryAutoUpdate" => $this->getAdvancedProperty("dserver.query-auto-update", false),
+			"queryTickUpdate" => $this->getAdvancedProperty("dserver.query-tick-update", true),
+			"motdMaxPlayers" => $this->getAdvancedProperty("dserver.motd-max-players", 0),
+			"queryMaxPlayers" => $this->getAdvancedProperty("dserver.query-max-players", 0),
+			"motdAllPlayers" => $this->getAdvancedProperty("dserver.motd-all-players", false),
+			"queryAllPlayers" => $this->getAdvancedProperty("dserver.query-all-players", false),
+			"motdPlayers" => $this->getAdvancedProperty("dserver.motd-players", false),
+			"queryPlayers" => $this->getAdvancedProperty("dserver.query-players", false),
+			"timer" => $this->getAdvancedProperty("dserver.time", 40),
+			"retryTimes" => $this->getAdvancedProperty("dserver.retry-times", 3),
+			"serverList" => explode(";", $this->getAdvancedProperty("dserver.server-list", ""))
+		];
+		$this->getLogger()->setWrite(!$this->getAdvancedProperty("server.disable-log", false));
+		$this->asyncChunkRequest = $this->getAdvancedProperty("server.async-chunk-request", true);
+		$this->limitedCreative = $this->getAdvancedProperty("server.limited-creative", true);
+		$this->chunkRadius = $this->getAdvancedProperty("player.chunk-radius", -1);
+		$this->allowSplashPotion = $this->getAdvancedProperty("server.allow-splash-potion", true);
+		$this->fireSpread = $this->getAdvancedProperty("level.fire-spread", false);
+		$this->advancedCommandSelector = $this->getAdvancedProperty("server.advanced-command-selector", false);
+		$this->anvilEnabled = $this->getAdvancedProperty("enchantment.enable-anvil", true);
+		$this->enchantingTableEnabled = $this->getAdvancedProperty("enchantment.enable-enchanting-table", true);
+		$this->countBookshelf = $this->getAdvancedProperty("enchantment.count-bookshelf", false);
+		$this->raklibDisable = $this->getAdvancedProperty("network.raklib-disable", false);
+		$this->allowInventoryCheats = $this->getAdvancedProperty("inventory.allow-cheats", false);
+		$this->checkMovement = $this->getAdvancedProperty("anticheat.check-movement", true);
+		$this->allowInstabreak = $this->getAdvancedProperty("anticheat.allow-instabreak", true);
+		$this->antiFly = $this->getAdvancedProperty("anticheat.anti-fly", true);
+		$this->folderpluginloader = $this->getAdvancedProperty("developer.folder-plugin-loader", false);
+	}
+	
+	/**
+	 * @return int
+	 *
+	 * Get DServer max players
+	 */
+	public function getDServerMaxPlayers(){
+		return ($this->dserverAllPlayers + $this->getMaxPlayers());
+	}
+
+	/**
+	 * @return int
+	 *
+	 * Get DServer all online player count
+	 */
+	public function getDServerOnlinePlayers(){
+		return ($this->dserverPlayers + count($this->getOnlinePlayers()));
+	}
+
+	public function isDServerEnabled(){
+		return $this->dserverConfig["enable"];
+	}
+
+	public function updateDServerInfo(){
+		$this->scheduler->scheduleAsyncTask(new DServerTask($this->dserverConfig["serverList"], $this->dserverConfig["retryTimes"]));
+	}
+
+>>>>>>> refs/remotes/origin/master
 	public function getBuild(){
 		return $this->version->getBuild();
 	}
@@ -1728,6 +1841,12 @@ class Server{
 			}
 
 			$this->enablePlugins(PluginLoadOrder::POSTWORLD);
+			
+			if($this->dserverConfig["enable"] and ($this->getAdvancedProperty("dserver.server-list", "") != "")) $this->scheduler->scheduleRepeatingTask(new scheduler\CallbackTask(
+			[
+				$this, "updateDServerInfo"
+			]),
+			$this->dserverConfig["timer"]);
 
 			$this->start();
 		}catch(\Throwable $e){
@@ -2511,6 +2630,20 @@ class Server{
 
 		foreach($this->players as $player){
 			$player->checkNetwork();
+		}
+
+		if(($this->tickCounter & 0b1111) === 0){
+			$this->titleTick();
+			$this->currentTPS = 20;
+			$this->currentUse = 0;
+
+			if(($this->tickCounter & 0b111111111) === 0){
+				if(($this->dserverConfig["enable"] and $this->dserverConfig["queryTickUpdate"]) or !$this->dserverConfig["enable"]){
+					$this->updateQuery();
+				}
+			}
+
+			$this->getNetwork()->updateName();
 		}
 
 		if($this->autoSave and ++$this->autoSaveTicker >= $this->autoSaveTicks){
