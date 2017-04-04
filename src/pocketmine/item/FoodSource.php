@@ -22,6 +22,7 @@
 namespace pocketmine\item;
 
 use pocketmine\entity\Effect;
+use pocketmine\entity\Entity;
 
 
 interface FoodSource{
@@ -35,6 +36,9 @@ interface FoodSource{
 	 * @return Effect[]
 	 */
 	public function getAdditionalEffects() : array;
-	
+
+    public function canBeConsumedBy(Entity $entity) : bool;
+
+    public function requiresHunger() : bool;
 	
 }

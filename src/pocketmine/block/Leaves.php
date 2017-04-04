@@ -26,8 +26,8 @@ use pocketmine\item\Item;
 use pocketmine\item\Tool;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\level\Level;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\Server;
 
 class Leaves extends Transparent{
 	const OAK = 0;
@@ -36,10 +36,9 @@ class Leaves extends Transparent{
 	const JUNGLE = 3;
 	const ACACIA = 0;
 	const DARK_OAK = 1;
-	
-	const WOOD_TYPE = self::WOOD;
 
 	protected $id = self::LEAVES;
+    protected $woodType = self::WOOD;
 
 	public function __construct($meta = 0){
 		$this->meta = $meta;
@@ -71,18 +70,18 @@ class Leaves extends Transparent{
 		return $names[$this->meta & 0x03];
 	}
 
-	private function findLog(Block $pos, array $visited, $distance, &$check, $fromSide = null){
+	protected function findLog(Block $pos, array $visited, $distance, &$check, $fromSide = null){
 		++$check;
 		$index = $pos->x . "." . $pos->y . "." . $pos->z;
 		if(isset($visited[$index])){
 			return false;
 		}
-		if($pos->getId() === static::WOOD_TYPE){
+		if($pos->getId() === $this->woodType){
 			return true;
 		}elseif($pos->getId() === $this->id and $distance < 3){
 			$visited[$index] = true;
-			$down = $pos->getSide(0)->getId();
-			if($down === static::WOOD_TYPE){
+			$down = $pos->getSide(Vector3::SIDE_DOWN)->getId();
+			if($down === $this->woodType){
 				return true;
 			}
 			if($fromSide === null){
@@ -91,7 +90,7 @@ class Leaves extends Transparent{
 						return true;
 					}
 				}
-			}else{ //No more loops
+			}else{
 				switch($fromSide){
 					case 2:
 						if($this->findLog($pos->getSide(2), $visited, $distance + 1, $check, $fromSide) === true){
@@ -148,7 +147,7 @@ class Leaves extends Transparent{
 				$visited = [];
 				$check = 0;
 
-				Server::getInstance()->getPluginManager()->callEvent($ev = new LeavesDecayEvent($this));
+                $this->getLevel()->getServer()->getPluginManager()->callEvent($ev = new LeavesDecayEvent($this));
 
 				if($ev->isCancelled() or $this->findLog($this, $visited, 0, $check) === true){
 					$this->getLevel()->setBlock($this, $this, false, false);
@@ -176,11 +175,11 @@ class Leaves extends Transparent{
 			$fortunel = $item->getEnchantmentLevel(Enchantment::TYPE_MINING_FORTUNE);
 			$fortunel = min(3, $fortunel);
 			$rates = [20,16,12,10];
-			if(mt_rand(1, $rates[$fortunel]) === 1){ //Saplings
+			if(mt_rand(1, $rates[$fortunel]) === 1){
 				$drops[] = [Item::SAPLING, $this->meta & 0x03, 1];
 			}
 			$rates = [200,180,160,120];
-			if(($this->meta & 0x03) === self::OAK and mt_rand(1, $rates[$fortunel]) === 1){ //Apples
+			if(($this->meta & 0x03) === self::OAK and mt_rand(1, $rates[$fortunel]) === 1){
 				$drops[] = [Item::APPLE, 0, 1];
 			}
 		}

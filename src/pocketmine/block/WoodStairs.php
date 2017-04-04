@@ -32,10 +32,6 @@ class WoodStairs extends Stair{
 		$this->meta = $meta;
 	}
 
-	public function getName() : string{
-		return "Wood Stairs";
-	}
-
 	public function getToolType(){
 		return Tool::TYPE_AXE;
 	}

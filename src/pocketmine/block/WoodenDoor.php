@@ -21,12 +21,32 @@
 
 namespace pocketmine\block;
 
+use pocketmine\item\Item;
+use pocketmine\item\Tool;
 
-class FenceGateSpruce extends FenceGate{
+class WoodenDoor extends Door{
 
-	protected $id = self::FENCE_GATE_SPRUCE;
+	protected $id = self::WOODEN_DOOR_BLOCK;
 
-	public function getName() : string{
-		return "Spruce Fence Gate";
+	public function __construct($meta = 0){
+		$this->meta = $meta;
+	}
+
+	public function canBeActivated() : bool {
+		return true;
+	}
+
+	public function getHardness() {
+		return 3;
+	}
+
+	public function getToolType(){
+		return Tool::TYPE_AXE;
+	}
+
+	public function getDrops(Item $item) : array {
+		return [
+			[Item::WOODEN_DOOR, 0, 1],
+		];
 	}
 }

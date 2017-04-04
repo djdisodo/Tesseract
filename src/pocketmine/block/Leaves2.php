@@ -29,10 +29,7 @@ class Leaves2 extends Leaves{
 	const WOOD_TYPE = self::WOOD2;
 
 	protected $id = self::LEAVES2;
-
-	public function __construct($meta = 0){
-		$this->meta = $meta;
-	}
+    protected $woodType = self::WOOD2;
 
 	public function getName() : string{
 		static $names = [
@@ -51,7 +48,7 @@ class Leaves2 extends Leaves{
 			$fortunel = min(3, $fortunel);
 			$rates = [20,16,12,10];
 			if(mt_rand(1, $rates[$fortunel]) === 1){ //Saplings
-				$drops[] = [Item::SAPLING, ($this->meta & 0x01) | 0x04, 1];
+                $drops[] = [Item::SAPLING, ($this->meta & 0x01) + 4, 1];
 			}
 		}
 
