@@ -45,6 +45,7 @@ use pocketmine\entity\hostile\ZombieVillager;
 use pocketmine\entity\Item as DroppedItem;
 use pocketmine\entity\neutral\CaveSpider;
 use pocketmine\entity\neutral\Enderman;
+use pocketmine\entity\neutral\EnderDragon;
 use pocketmine\entity\neutral\PigZombie;
 use pocketmine\entity\neutral\Spider;
 use pocketmine\entity\passive\Bat;
@@ -203,7 +204,7 @@ abstract class Entity extends Location implements Metadatable{
 		Entity::registerEntity(DroppedItem::class);
 		Entity::registerEntity(Egg::class);
 		Entity::registerEntity(Enderman::class);
-		//Entity::registerEntity(EnderDragon::class);
+		Entity::registerEntity(EnderDragon::class);
 		Entity::registerEntity(EnderPearl::class);
 		Entity::registerEntity(FallingSand::class);
 		Entity::registerEntity(FishingHook::class);
