@@ -8,7 +8,7 @@ timings/*
 server.properties
 /pocketmine.yml
 *.txt
-tesseract.yml
+/tesseract.yml
 crashdumps/*
 .idea/*
 nbproject/*
