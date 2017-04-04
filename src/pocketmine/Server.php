@@ -1424,51 +1424,6 @@ class Server{
 			Server::$sleeper->wait($ms);
 		}, $microseconds);
 	}
-
-	public function loadAdvancedConfig(){
-		$this->weatherEnabled = $this->getAdvancedProperty("level.weather", true);
-		$this->foodEnabled = $this->getAdvancedProperty("player.hunger", true);
-		$this->expEnabled = $this->getAdvancedProperty("player.experience", true);
-		$this->keepInventory = $this->getAdvancedProperty("player.keep-inventory", false);
-		$this->keepExperience = $this->getAdvancedProperty("player.keep-experience", false);
-		$this->netherEnabled = $this->getAdvancedProperty("level.allow-nether", false);
-		$this->netherName = $this->getAdvancedProperty("level.level-name", "nether");
-		$this->weatherRandomDurationMin = $this->getAdvancedProperty("level.weather-random-duration-min", 6000);
-		$this->weatherRandomDurationMax = $this->getAdvancedProperty("level.weather-random-duration-max", 12000);
-		$this->lightningTime = $this->getAdvancedProperty("level.lightning-time", 200);
-		$this->lightningFire = $this->getAdvancedProperty("level.lightning-fire", false);
-		$this->autoClearInv = $this->getAdvancedProperty("player.auto-clear-inventory", true);
-		$this->dserverConfig = [
-			"enable" => $this->getAdvancedProperty("dserver.enable", false),
-			"queryAutoUpdate" => $this->getAdvancedProperty("dserver.query-auto-update", false),
-			"queryTickUpdate" => $this->getAdvancedProperty("dserver.query-tick-update", true),
-			"motdMaxPlayers" => $this->getAdvancedProperty("dserver.motd-max-players", 0),
-			"queryMaxPlayers" => $this->getAdvancedProperty("dserver.query-max-players", 0),
-			"motdAllPlayers" => $this->getAdvancedProperty("dserver.motd-all-players", false),
-			"queryAllPlayers" => $this->getAdvancedProperty("dserver.query-all-players", false),
-			"motdPlayers" => $this->getAdvancedProperty("dserver.motd-players", false),
-			"queryPlayers" => $this->getAdvancedProperty("dserver.query-players", false),
-			"timer" => $this->getAdvancedProperty("dserver.time", 40),
-			"retryTimes" => $this->getAdvancedProperty("dserver.retry-times", 3),
-			"serverList" => explode(";", $this->getAdvancedProperty("dserver.server-list", ""))
-		];
-		$this->getLogger()->setWrite(!$this->getAdvancedProperty("server.disable-log", false));
-		$this->asyncChunkRequest = $this->getAdvancedProperty("server.async-chunk-request", true);
-		$this->limitedCreative = $this->getAdvancedProperty("server.limited-creative", true);
-		$this->chunkRadius = $this->getAdvancedProperty("player.chunk-radius", -1);
-		$this->allowSplashPotion = $this->getAdvancedProperty("server.allow-splash-potion", true);
-		$this->fireSpread = $this->getAdvancedProperty("level.fire-spread", false);
-		$this->advancedCommandSelector = $this->getAdvancedProperty("server.advanced-command-selector", false);
-		$this->anvilEnabled = $this->getAdvancedProperty("enchantment.enable-anvil", true);
-		$this->enchantingTableEnabled = $this->getAdvancedProperty("enchantment.enable-enchanting-table", true);
-		$this->countBookshelf = $this->getAdvancedProperty("enchantment.count-bookshelf", false);
-		$this->raklibDisable = $this->getAdvancedProperty("network.raklib-disable", false);
-		$this->allowInventoryCheats = $this->getAdvancedProperty("inventory.allow-cheats", false);
-		$this->checkMovement = $this->getAdvancedProperty("anticheat.check-movement", true);
-		$this->allowInstabreak = $this->getAdvancedProperty("anticheat.allow-instabreak", true);
-		$this->antiFly = $this->getAdvancedProperty("anticheat.anti-fly", true);
-		$this->folderpluginloader = $this->getAdvancedProperty("developer.folder-plugin-loader", false);
-	}
 	
 	/**
 	 * @return int
