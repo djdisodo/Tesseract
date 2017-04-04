@@ -35,6 +35,9 @@ class EnderDragon extends Monster {
 	public $length = 0.9;
 	public $height = 1.8;
 
+	private $maxHealth = 200;
+	public $dropExp = 12000;
+
 	public function getName(){
 		return "EnderDragon";
 	}
