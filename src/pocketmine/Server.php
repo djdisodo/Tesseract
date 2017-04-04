@@ -80,7 +80,6 @@ use pocketmine\network\query\QueryHandler;
 use pocketmine\network\RakLibInterface;
 use pocketmine\network\rcon\RCON;
 use pocketmine\network\upnp\UPnP;
-use pocketmine\resourcepacks\ResourcePackManager;
 use pocketmine\permission\BanList;
 use pocketmine\permission\DefaultPermissions;
 use pocketmine\plugin\PharPluginLoader;
@@ -184,9 +183,6 @@ class Server{
 
 	/** @var CraftingManager */
 	private $craftingManager;
-
-	/** @var ResourcePackManager */
-	private $resourceManager;
 
 	/** @var ConsoleCommandSender */
 	private $consoleSender;
@@ -659,13 +655,6 @@ class Server{
 	 */
 	public function getCraftingManager(){
 		return $this->craftingManager;
-	}
-
-	/**
-	 * @return ResourcePackManager
-	 */
-	public function getResourceManager() : ResourcePackManager{
-		return $this->resourceManager;
 	}
 
 	/**
@@ -1735,16 +1724,14 @@ class Server{
 			Color::init();
 			$this->craftingManager = new CraftingManager();
 
-			$this->resourceManager = new ResourcePackManager($this, $this->getDataPath() . "packs" . DIRECTORY_SEPARATOR);
-
 			$this->pluginManager = new PluginManager($this, $this->commandMap);
 			$this->pluginManager->subscribeToPermission(Server::BROADCAST_CHANNEL_ADMINISTRATIVE, $this->consoleSender);
 			$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
 			$this->profilingTickRate = (float) $this->getProperty("settings.profile-report-trigger", 20);
 			$this->pluginManager->registerInterface(PharPluginLoader::class);
 			if($this->getProperty("settings.folder-plugin-loader", true)) {
-                		$this->pluginManager->registerInterface(FolderPluginLoader::class);
-			}
+                $this->pluginManager->registerInterface(FolderPluginLoader::class);
+            }
 			$this->pluginManager->registerInterface(ScriptPluginLoader::class);
 
 			//set_exception_handler([$this, "exceptionHandler"]);
