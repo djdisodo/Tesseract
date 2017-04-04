@@ -22,10 +22,12 @@
 namespace pocketmine\entity;
 
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityEffectAddEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\Player;
+use pocketmine\utils\Config;
 
 class Effect{
 	const SPEED = 1;
@@ -58,38 +60,24 @@ class Effect{
 	const MAX_DURATION = 2147483648;
 
 	/** @var Effect[] */
-	protected static $effects;
+	protected static $effects = [];
 
 	public static function init(){
-		self::$effects = new \SplFixedArray(256);
+        $config = new Config(\pocketmine\PATH . "src/pocketmine/resources/effects.json", Config::JSON, []);
 
-		self::$effects[Effect::SPEED] = new Effect(Effect::SPEED, "%potion.moveSpeed", 124, 175, 198);
-		self::$effects[Effect::SLOWNESS] = new Effect(Effect::SLOWNESS, "%potion.moveSlowdown", 90, 108, 129, true);
-		self::$effects[Effect::SWIFTNESS] = new Effect(Effect::SWIFTNESS, "%potion.digSpeed", 217, 192, 67);
-		self::$effects[Effect::FATIGUE] = new Effect(Effect::FATIGUE, "%potion.digSlowDown", 74, 66, 23, true);
-		self::$effects[Effect::STRENGTH] = new Effect(Effect::STRENGTH, "%potion.damageBoost", 147, 36, 35);
-		self::$effects[Effect::HEALING] = new InstantEffect(Effect::HEALING, "%potion.heal", 248, 36, 35);
-		self::$effects[Effect::HARMING] = new InstantEffect(Effect::HARMING, "%potion.harm", 67, 10, 9, true);
-		self::$effects[Effect::JUMP] = new Effect(Effect::JUMP, "%potion.jump", 34, 255, 76);
-		self::$effects[Effect::NAUSEA] = new Effect(Effect::NAUSEA, "%potion.confusion", 85, 29, 74, true);
-		self::$effects[Effect::REGENERATION] = new Effect(Effect::REGENERATION, "%potion.regeneration", 205, 92, 171);
-		self::$effects[Effect::DAMAGE_RESISTANCE] = new Effect(Effect::DAMAGE_RESISTANCE, "%potion.resistance", 153, 69, 58);
-		self::$effects[Effect::FIRE_RESISTANCE] = new Effect(Effect::FIRE_RESISTANCE, "%potion.fireResistance", 228, 154, 58);
-		self::$effects[Effect::WATER_BREATHING] = new Effect(Effect::WATER_BREATHING, "%potion.waterBreathing", 46, 82, 153);
-		self::$effects[Effect::INVISIBILITY] = new Effect(Effect::INVISIBILITY, "%potion.invisibility", 127, 131, 146);
-
-		self::$effects[Effect::BLINDNESS] = new Effect(Effect::BLINDNESS, "%potion.blindness", 191, 192, 192);
-		self::$effects[Effect::NIGHT_VISION] = new Effect(Effect::NIGHT_VISION, "%potion.nightVision", 0, 0, 139);
-		self::$effects[Effect::HUNGER] = new Effect(Effect::HUNGER, "%potion.hunger", 46, 139, 87);
-
-		self::$effects[Effect::WEAKNESS] = new Effect(Effect::WEAKNESS, "%potion.weakness", 72, 77, 72 , true);
-		self::$effects[Effect::POISON] = new Effect(Effect::POISON, "%potion.poison", 78, 147, 49, true);
-		self::$effects[Effect::WITHER] = new Effect(Effect::WITHER, "%potion.wither", 53, 42, 39, true);
-		self::$effects[Effect::HEALTH_BOOST] = new Effect(Effect::HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
-
-		self::$effects[Effect::ABSORPTION] = new Effect(Effect::ABSORPTION, "%potion.absorption", 36, 107, 251);
-		self::$effects[Effect::SATURATION] = new Effect(Effect::SATURATION, "%potion.saturation", 255, 0, 255);
+        foreach($config->getAll() as $name => $data){
+            $color = hexdec($data["color"]);
+            $r = ($color >> 16) & 0xff;
+            $g = ($color >> 8) & 0xff;
+            $b = $color & 0xff;
+            self::registerEffect($name, new Effect($data["id"], "%" . $data["name"], $r, $g, $b, $data["isBad"] ?? false));
+        }
 	}
+
+    public static function registerEffect(string $internalName, Effect $effect){
+        self::$effects[$effect->getId()] = $effect;
+        self::$effects[$internalName] = $effect;
+    }
 
 	/**
 	 * @param int $id
@@ -103,8 +91,8 @@ class Effect{
 	}
 
 	public static function getEffectByName($name){
-		if(defined(Effect::class . "::" . strtoupper($name))){
-			return self::getEffect(constant(Effect::class . "::" . strtoupper($name)));
+        if(isset(self::$effects[$name])){
+            return clone self::$effects[$name];
 		}
 		return null;
 	}
@@ -274,9 +262,7 @@ class Effect{
 				break;
 			case Effect::SATURATION:
 				if($entity instanceof Player){
-					if($entity->getServer()->foodEnabled) {
-						$entity->setFood($entity->getFood() + 1);
-					}
+                    $entity->setFood($entity->getFood() + 1);
 				}
 				break;
 		}
@@ -291,69 +277,99 @@ class Effect{
 	}
 
 	public function add(Entity $entity, $modify = false, Effect $oldEffect = null){
-		if($entity instanceof Player){
-			$pk = new MobEffectPacket();
-			$pk->eid = $entity->getId();
-			$pk->effectId = $this->getId();
-			$pk->amplifier = $this->getAmplifier();
-			$pk->particles = $this->isVisible();
-			$pk->duration = $this->getDuration();
-			if($modify){
-				$pk->eventId = MobEffectPacket::EVENT_MODIFY;
-			}else{
-				$pk->eventId = MobEffectPacket::EVENT_ADD;
-			}
+		if($entity instanceof Player) {
+            $pk = new MobEffectPacket();
+            $pk->eid = $entity->getId();
+            $pk->effectId = $this->getId();
+            $pk->amplifier = $this->getAmplifier();
+            $pk->particles = $this->isVisible();
+            $pk->duration = $this->getDuration();
+            if ($modify) {
+                $pk->eventId = MobEffectPacket::EVENT_MODIFY;
+            } else {
+                $pk->eventId = MobEffectPacket::EVENT_ADD;
+            }
 
-			$entity->dataPacket($pk);
+            $entity->dataPacket($pk);
+        }
 
-			if($this->id === Effect::SPEED){
-				$attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
-				if($modify and $oldEffect !== null){
-					$speed = $attr->getValue() / (1 + 0.2 * ($oldEffect->getAmplifier() + 1));
-				}else{
-					$speed = $attr->getValue();
-				}
-				$speed *= (1 + 0.2 * ($this->amplifier + 1));
-				$attr->setValue($speed);
-			}elseif($this->id === Effect::SLOWNESS){
-				$attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
-				if($modify and $oldEffect !== null){
-					$speed = $attr->getValue() / (1 - 0.15 * ($oldEffect->getAmplifier() + 1));
-				}else{
-					$speed = $attr->getValue();
-				}
-				$speed *= (1 - (0.15 * $this->amplifier + 1));
-				$attr->setValue($speed);
-			}
-		}
-
-		if($this->id === Effect::INVISIBILITY){
-			$entity->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, true);
-			$entity->setNameTagVisible(false);
-		}
+        switch($this->id){
+            case Effect::INVISIBILITY:
+                $entity->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, true);
+                $entity->setNameTagVisible(false);
+                break;
+            case Effect::SPEED:
+                $attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
+                if($modify and $oldEffect !== null){
+                    $speed = $attr->getValue() / (1 + 0.2 * $oldEffect->getAmplifier());
+                }else{
+                    $speed = $attr->getValue();
+                }
+                $speed *= (1 + 0.2 * $this->amplifier);
+                $attr->setValue($speed);
+                break;
+            case Effect::SLOWNESS:
+                $attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
+                if($modify and $oldEffect !== null){
+                    $speed = $attr->getValue() / (1 - 0.15 * $oldEffect->getAmplifier());
+                }else{
+                    $speed = $attr->getValue();
+                }
+                $speed *= (1 - 0.15 * $this->amplifier);
+                $attr->setValue($speed, true);
+                break;
+            case Effect::HEALTH_BOOST:
+                $attr = $entity->getAttributeMap()->getAttribute(Attribute::HEALTH);
+                if($modify and $oldEffect !== null){
+                    $max = $attr->getMaxValue() - (4 * ($oldEffect->getAmplifier() + 1));
+                }else{
+                    $max = $attr->getMaxValue();
+                }
+                $max += (4 * ($this->amplifier + 1));
+                $attr->setMaxValue($max);
+                break;
+            case Effect::ABSORPTION:
+                if($modify and $oldEffect !== null){
+                    $value = $entity->getAbsorption() - (4 * ($oldEffect->getAmplifier() + 1));
+                }else{
+                    $value = $entity->getAbsorption();
+                }
+                $value += (4 * ($this->amplifier + 1));
+                $entity->setAbsorption($value);
+                break;
+        }
 	}
 
 	public function remove(Entity $entity){
-		if($entity instanceof Player){
-			$pk = new MobEffectPacket();
-			$pk->eid = $entity->getId();
-			$pk->eventId = MobEffectPacket::EVENT_REMOVE;
-			$pk->effectId = $this->getId();
+		if($entity instanceof Player) {
+            $pk = new MobEffectPacket();
+            $pk->eid = $entity->getId();
+            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
+            $pk->effectId = $this->getId();
 
-			$entity->dataPacket($pk);
+            $entity->dataPacket($pk);
+        }
 
-			if($this->id === Effect::SPEED){
-				$attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
-				$attr->setValue($attr->getValue() / (1 + 0.2 * ($this->amplifier + 1)));
-			}elseif($this->id === Effect::SLOWNESS){
-				$attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
-				$attr->setValue($attr->getValue() / (1 - 0.15 * ($this->amplifier + 1)));
-			}
-		}
-
-		if($this->id === Effect::INVISIBILITY){
-			$entity->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, false);
-			$entity->setNameTagVisible(true);
-		}
+            switch ($this->id) {
+                case Effect::INVISIBILITY:
+                    $entity->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, false);
+                    $entity->setNameTagVisible(true);
+                    break;
+                case Effect::SPEED:
+                    $attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
+                    $attr->setValue($attr->getValue() / (1 + 0.2 * $this->amplifier));
+                    break;
+                case Effect::SLOWNESS:
+                    $attr = $entity->getAttributeMap()->getAttribute(Attribute::MOVEMENT_SPEED);
+                    $attr->setValue($attr->getValue() / (1 - 0.15 * $this->amplifier));
+                    break;
+                case Effect::HEALTH_BOOST:
+                    $attr = $entity->getAttributeMap()->getAttribute(Attribute::HEALTH);
+                    $attr->setMaxValue($attr->getMaxValue() - (4 * ($this->amplifier + 1)));
+                    break;
+                case Effect::ABSORPTION:
+                    $entity->setAbsorption($entity->getAbsorption() - (4 * ($this->amplifier + 1)));
+                    break;
+            }
 	}
 }
