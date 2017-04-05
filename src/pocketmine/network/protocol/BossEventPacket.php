@@ -51,7 +51,7 @@ class BossEventPacket extends DataPacket{
 		return "BossEventPacket";
 	}
 
-    /*public function handle(NetworkSession $session) : bool{
+    public function handle(NetworkSession $session) : bool{
         return $session->handleBossbar($this);
-    }*/
+    }
 }

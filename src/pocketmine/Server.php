@@ -263,41 +263,6 @@ class Server{
 
 	private $aboutContent = "";
 
-	/** Advanced Config */
-	public $advancedConfig = null;
-
-	public $weatherEnabled = true;
-	public $foodEnabled = true;
-	public $expEnabled = true;
-	public $keepInventory = false;
-	public $netherEnabled = false;
-	public $netherName = "nether";
-	public $weatherRandomDurationMin = 6000;
-	public $weatherRandomDurationMax = 12000;
-	public $lightningTime = 200;
-	public $lightningFire = false;
-	public $version;
-	public $autoClearInv = true;
-	public $dserverConfig = [];
-	public $dserverPlayers = 0;
-	public $dserverAllPlayers = 0;
-	public $anvilEnabled = false;
-	public $asyncChunkRequest = true;
-	public $keepExperience = false;
-	public $limitedCreative = true;
-	public $chunkRadius = -1;
-	public $allowSplashPotion = true;
-	public $fireSpread = false;
-	public $advancedCommandSelector = false;
-	public $enchantingTableEnabled = true;
-	public $countBookshelf = false;
-	public $allowInventoryCheats = false;
-	public $raklibDisable = false;
-	public $checkMovement = true;
-	public $antiFly = true;
-	public $allowInstabreak = false;
-	public $folderpluginloader = false;
-
 	/**
 	 * @return string
 	 */
@@ -1429,27 +1394,27 @@ class Server{
 	 * @return int
 	 *
 	 * Get DServer max players
-	 */
+	 *
 	public function getDServerMaxPlayers(){
 		return ($this->dserverAllPlayers + $this->getMaxPlayers());
-	}
+	}*/
 
 	/**
 	 * @return int
 	 *
 	 * Get DServer all online player count
 	 */
-	public function getDServerOnlinePlayers(){
+	/*public function getDServerOnlinePlayers(){
 		return ($this->dserverPlayers + count($this->getOnlinePlayers()));
 	}
-
+*/
 	public function isDServerEnabled(){
-		return $this->dserverConfig["enable"];
+		return null;//return $this->dserverConfig["enable"];
 	}
 
-	public function updateDServerInfo(){
+	/*public function updateDServerInfo(){
 		$this->scheduler->scheduleAsyncTask(new DServerTask($this->dserverConfig["serverList"], $this->dserverConfig["retryTimes"]));
-	}
+	}*/
 
 	public function getBuild(){
 		return $this->version->getBuild();
@@ -1778,11 +1743,11 @@ class Server{
 
 			$this->enablePlugins(PluginLoadOrder::POSTWORLD);
 			
-			if($this->dserverConfig["enable"] and ($this->getAdvancedProperty("dserver.server-list", "") != "")) $this->scheduler->scheduleRepeatingTask(new scheduler\CallbackTask(
+			/*if($this->dserverConfig["enable"] and ($this->getAdvancedProperty("dserver.server-list", "") != "")) $this->scheduler->scheduleRepeatingTask(new scheduler\CallbackTask(
 			[
 				$this, "updateDServerInfo"
 			]),
-			$this->dserverConfig["timer"]);
+			$this->dserverConfig["timer"]);*/
 
 			$this->start();
 		}catch(\Throwable $e){
@@ -2573,11 +2538,11 @@ class Server{
 			$this->currentTPS = 20;
 			$this->currentUse = 0;
 
-			if(($this->tickCounter & 0b111111111) === 0){
+			/*if(($this->tickCounter & 0b111111111) === 0){
 				if(($this->dserverConfig["enable"] and $this->dserverConfig["queryTickUpdate"]) or !$this->dserverConfig["enable"]){
 					$this->updateQuery();
 				}
-			}
+			}*/
 
 			$this->getNetwork()->updateName();
 		}

@@ -43,6 +43,8 @@ abstract class DataPacket extends BinaryStream{
 
 	abstract public function decode();
 
+    abstract public function handle(NetworkSession $session) : bool;
+
 	public function reset(){
 		$this->buffer = chr($this::NETWORK_ID);
 		$this->offset = 0;
@@ -173,8 +175,4 @@ abstract class DataPacket extends BinaryStream{
 	public function getName(){
 		return "DataPacket";
 	}
-
-    public function handle(NetworkSession $session) : bool{
-        return $session->handleDataPacket($this);
-    }
 }
