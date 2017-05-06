@@ -102,6 +102,7 @@ use pocketmine\utils\Terminal;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Utils;
 use pocketmine\utils\UUID;
+use pocketmine\resourcepacks\ResourcePackManager;
 
 //TODO use pocketmine\level\generator\ender\Ender;
 
@@ -183,6 +184,9 @@ class Server{
 
 	/** @var CraftingManager */
 	private $craftingManager;
+	
+	/** @var ResourcePackManager */
+	private $resourceManager;
 
 	/** @var ConsoleCommandSender */
 	private $consoleSender;
@@ -725,6 +729,13 @@ class Server{
 
 	public function addRecipe(Recipe $recipe){
 		$this->craftingManager->registerRecipe($recipe);
+	}
+	
+    /**
+	 * @return ResourcePackManager
+	 */
+	public function getResourceManager() : ResourcePackManager{
+		return $this->resourceManager;
 	}
 
 	public function shouldSavePlayerData() : bool{
@@ -1744,6 +1755,8 @@ class Server{
 			Color::init();
 			$this->craftingManager = new CraftingManager();
 
+			$this->resourceManager = new ResourcePackManager($this, $this->getDataPath() . "resource_packs" . DIRECTORY_SEPARATOR);
+			
 			$this->pluginManager = new PluginManager($this, $this->commandMap);
 			$this->pluginManager->subscribeToPermission(Server::BROADCAST_CHANNEL_ADMINISTRATIVE, $this->consoleSender);
 			$this->pluginManager->setUseTimings($this->getProperty("settings.enable-profiling", false));
