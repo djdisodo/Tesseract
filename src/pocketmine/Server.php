@@ -616,6 +616,13 @@ class Server{
 	public  function  getInventorySlots() {
 		return $this->getConfigInt("Inventory-slots", 36);
 	}
+	
+	/**
+	 * @return bool
+	 */
+	public  function  isMultiVersion() {
+		return $this->getConfigBoolean("multi-version", false);
+	}
 
 	/**
 	 * @return \ClassLoader
@@ -1589,6 +1596,7 @@ class Server{
 				"auto-save" => true,
 				"online-mode" => false,
 				"inventory-slots" => 36,
+				"multi-version" => false,
 			]);
 			
 			$version = $this->getFormattedVersion();
