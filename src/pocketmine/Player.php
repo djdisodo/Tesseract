@@ -71,7 +71,6 @@ use pocketmine\event\player\PlayerRespawnEvent;
 use pocketmine\event\player\PlayerToggleFlightEvent;
 use pocketmine\event\player\PlayerToggleSneakEvent;
 use pocketmine\event\player\PlayerToggleSprintEvent;
-use pocketmine\event\player\PlayerTransferEvent;
 use pocketmine\event\player\PlayerUseFishingRodEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
@@ -130,7 +129,12 @@ use pocketmine\network\protocol\InteractPacket;
 use pocketmine\network\protocol\MovePlayerPacket;
 use pocketmine\network\protocol\PlayerActionPacket;
 use pocketmine\network\protocol\PlayStatusPacket;
+use pocketmine\network\protocol\ResourcePackChunkDataPacket;
+use pocketmine\network\protocol\ResourcePackChunkRequestPacket;
+use pocketmine\network\protocol\ResourcePackClientResponsePacket;
+use pocketmine\network\protocol\ResourcePackDataInfoPacket;
 use pocketmine\network\protocol\ResourcePacksInfoPacket;
+use pocketmine\network\protocol\ResourcePackStackPacket;
 use pocketmine\network\protocol\RespawnPacket;
 use pocketmine\network\protocol\SetEntityMotionPacket;
 use pocketmine\network\protocol\SetSpawnPositionPacket;
@@ -140,7 +144,6 @@ use pocketmine\network\protocol\StartGamePacket;
 use pocketmine\network\protocol\SetPlayerGameTypePacket;
 use pocketmine\network\protocol\TakeItemEntityPacket;
 use pocketmine\network\protocol\TextPacket;
-use pocketmine\network\protocol\TransferPacket;
 use pocketmine\network\protocol\UpdateAttributesPacket;
 use pocketmine\network\protocol\UpdateBlockPacket;
 use pocketmine\network\SourceInterface;
@@ -148,6 +151,7 @@ use pocketmine\permission\BanEntry;
 use pocketmine\permission\PermissibleBase;
 use pocketmine\permission\PermissionAttachment;
 use pocketmine\plugin\Plugin;
+use pocketmine\resourcepacks\ResourcePack;
 use pocketmine\tile\ItemFrame;
 use pocketmine\tile\Spawnable;
 use pocketmine\utils\TextFormat;
@@ -1774,13 +1778,13 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		return ($dot1 - $dot) >= -$maxDiff;
 	}
 	
-	public function onPlayerPreLogin(){
+	/*public function onPlayerPreLogin(){
 		$pk = new PlayStatusPacket();
 		$pk->status = PlayStatusPacket::LOGIN_SUCCESS;
 		$this->dataPacket($pk);
 		
 		$this->processLogin();
-	}
+	}*/
 
 	public function clearCreativeItems(){
 		$this->personalCreativeItems = [];
@@ -2100,12 +2104,68 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				$pk->status = PlayStatusPacket::LOGIN_SUCCESS;
 				$this->directDataPacket($pk);
 
-                $this->dataPacket(new ResourcePacksInfoPacket());
+				$infoPacket = new ResourcePacksInfoPacket();
+        		$infoPacket->resourcePackEntries = $this->server->getResourcePackManager()->getResourceStack();
+        		$infoPacket->mustAccept = $this->server->forceResources;
+        		$this->directDataPacket($infoPacket);
 				
-				if($this->isConnected()){
-					$this->onPlayerPreLogin();
-				}
+				/*if($this->isConnected()){
+					$this->processLogin();
+				}*/
 				break;
+
+            case ProtocolInfo::RESOURCE_PACK_CLIENT_RESPONSE_PACKET:
+               	switch($packet->status){
+		 			case ResourcePackClientResponsePacket::STATUS_REFUSED:
+		  				$this->close("", "must accept resource packs to join", true);
+		  				break;
+		  			case ResourcePackClientResponsePacket::STATUS_SEND_PACKS:
+		 				$manager = $this->server->getResourcePackManager();
+		 				foreach($packet->packIds as $uuid){
+		 					$pack = $manager->getPackById($uuid);
+		 					if(!($pack instanceof ResourcePack)){
+		 						//Client requested a resource pack but we don't have it available on the server
+		 						$this->close("", "disconnectionScreen.resourcePack", true); //TODO: add strings to lang files
+		 						break;
+		 					}
+		 
+		 					$pk = new ResourcePackDataInfoPacket();
+		 					$pk->packId = $pack->getPackId();
+		 					$pk->maxChunkSize = 1048576; //1MB
+		 					$pk->chunkCount = $pack->getPackSize() / $pk->maxChunkSize;
+		 					$pk->compressedPackSize = $pack->getPackSize();
+		 					$pk->sha256 = $pack->getSha256();
+		 					$this->dataPacket($pk);
+		 				}
+		 				break;
+		 			case ResourcePackClientResponsePacket::STATUS_HAVE_ALL_PACKS:
+		 				$pk = new ResourcePackStackPacket();
+		 				$manager = $this->server->getResourcePackManager();
+		 				$pk->resourcePackStack = $manager->getResourceStack();
+		 				$pk->mustAccept = $manager->resourcePacksRequired();
+		 				$this->dataPacket($pk);
+		  				break;
+		  			case ResourcePackClientResponsePacket::STATUS_COMPLETED:
+		  				$this->processLogin();
+		  				break;
+		  		}
+		  		break;
+
+		  	case ProtocolInfo::RESOURCE_PACK_CHUNK_REQUEST_PACKET:
+		  		$manager = $this->server->getResourcePackManager();
+ 				$pack = $manager->getPackById($packet->packId);
+ 				if(!($pack instanceof ResourcePack)){
+ 					$this->close("", "disconnectionScreen.resourcePack", true);
+ 					return true;
+ 				}
+ 
+ 				$pk = new ResourcePackChunkDataPacket();
+ 				$pk->packId = $pack->getPackId();
+ 				$pk->chunkIndex = $packet->chunkIndex;
+ 				$pk->data = $pack->getPackChunk(1048576 * $packet->chunkIndex, 1048576);
+ 				$pk->progress = (1048576 * $packet->chunkIndex);
+ 				$this->dataPacket($pk);
+                break;
 
 			case ProtocolInfo::MOVE_PLAYER_PACKET:
 				if($this->linkedEntity instanceof Entity){
@@ -3413,19 +3473,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public function sendTitle(string $title, string $subtitle = "", int $fadein = -1, int $fadeout = -1, int $duration = -1){
           $this->prepareTitle($title, $subtitle, $fadein, $fadeout, $duration); //correct the bug but not optimized
           $this->prepareTitle($title, $subtitle, $fadein, $fadeout, $duration);
-	}
-	
-	public function transfer($address, int $port){
-		$ev = new PlayerTransferEvent($this, $address, $port);
-		$this->server->getPluginManager()->callEvent($ev);
-		if(!$ev->isCancelled()){
-			$pk = new TransferPacket();
-			$pk->address = $address;
-			$pk->port = $port;
-			$this->dataPacket($pk);
-			return true;
-		}
-		return false;
 	}
 	
 	/**
